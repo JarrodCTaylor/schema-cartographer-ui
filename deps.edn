@@ -1,0 +1,37 @@
+{:paths ["src" "resources"]
+
+ :deps {org.clojure/clojure         {:mvn/version "1.10.3"}
+        org.clojure/clojurescript   {:mvn/version "1.10.773"}
+        org.clojure/test.check      {:mvn/version "1.1.0"}
+        org.clojure/tools.cli       {:mvn/version "1.0.206"}
+        day8.re-frame/http-fx       {:mvn/version "0.1.6"}
+        thheller/shadow-cljs        {:mvn/version "2.11.6"}
+        metosin/reitit              {:mvn/version "0.5.5"}
+        expound/expound             {:mvn/version "0.8.5"}
+        re-frame/re-frame           {:mvn/version "1.1.1"}
+        reagent/reagent             {:mvn/version "1.0.0-alpha2"}
+        day8.re-frame/async-flow-fx {:mvn/version "0.1.0"}}
+
+ :aliases {;  clojure -Acljs-test
+           ; -------------------------------------------------------------------
+           :cljs-test {:extra-paths ["test"]
+                       :extra-deps  {day8.re-frame/test          {:mvn/version "0.1.5"}}
+                       :main-opts   ["-m" "shadow.cljs.devtools.cli" "watch" "test"]}
+
+           :ci {:extra-paths ["test"]
+                :extra-deps  {day8.re-frame/test          {:mvn/version "0.1.5"}
+                              binaryage/devtools          {:mvn/version "1.0.2"}}
+                :main-opts   ["-m" "shadow.cljs.devtools.cli" "compile" "ci"]}
+
+           ;; ===
+           ;  Min production build
+           ;  clojure -Acljs-min
+           :cljs-min {:main-opts ["-m" "shadow.cljs.devtools.cli" "release" "app"]}
+
+           ;; ===
+           ;  clojure -Acljs-dev
+           :cljs-dev {:extra-paths ["test"]
+                      :main-opts   ["-m" "shadow.cljs.devtools.cli" "watch" "app"]
+                      :extra-deps  {day8.re-frame/test          {:mvn/version "0.1.5"}
+                                    binaryage/devtools          {:mvn/version "1.0.2"}}}}}
+

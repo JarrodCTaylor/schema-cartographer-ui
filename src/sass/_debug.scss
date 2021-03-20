@@ -1,0 +1,312 @@
+$debug-color1: #2F3641;
+$debug-color2: #3C4350;
+$debug-color3: #8299A5;
+$debug-color4: #60656F;
+$debug-color5: #58656F;
+$debug-color6: #DFDCDF;
+$debug-color7: #6AAFCE;
+$debug-color8: #767578;
+$debug-color9: #9FC851;
+$debug-color10: #677059;
+$debug-color11: #FD6B04;
+
+#debug-template {
+  color: $debug-color6;
+  background-color: $debug-color1;
+  min-height: 100vh;
+  font-size: 1.1em;
+  font-family: acumin-pro,sans-serif;
+  font-weight: 400;
+  font-style: normal;
+
+  .card {
+    background: $debug-color2;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
+    color: $debug-color6;
+  }
+
+  #event-selector {
+    display: flex;
+    justify-content: center;
+    .event-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      p {
+        font-size: 1.5em;
+        color: $debug-color6
+      }
+      &:hover {
+        cursor: pointer;
+        color: darken($debug-color6, 15)
+      }
+    }
+
+    #select-box-div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .select-box {
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
+        position: relative;
+        display: inline-block;
+        margin: 0 10px 0;
+        &:after {
+          content: '▼';
+          position: absolute;
+          width: 38px;
+          color: $debug-color6;
+          font-weight: bold;
+          font-size: 16px;
+          right: -11px;
+          bottom: 8px;
+          top: 12px;
+          pointer-events: none;
+          z-index: 2;
+        }
+        &:before {
+          content: '';
+          right: 0px;
+          width: 37px;
+          height: 38px;
+          background: darken($debug-color2, 5);
+          position: absolute;
+          pointer-events: none;
+          display: block;
+          z-index: 1;
+          -webkit-border-radius: 1px;
+          -moz-border-radius: 1px;
+          border-radius: 1px;
+        }
+        select {
+          position: relative;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          background: $debug-color2;
+          color: $debug-color6;
+          border: none;
+          outline: none;
+          font-size: 1.1em;
+          padding-left: 0.3em;
+          margin: 0;
+          -webkit-border-radius: 1px;
+          -moz-border-radius: 1px;
+          border-radius: 1px;
+          cursor: pointer;
+          height: 38px;
+          min-width: 500px;
+        }
+      }
+    }
+  }
+
+  #event-card {
+    margin: auto;
+    padding-left: 1em;
+    padding-right: 1em;
+    width: 95%;
+    #event-name {
+      display: flex;
+      justify-content: space-between;
+      .title {
+        font-weight: bold;
+      }
+      .icon {
+        font-size: 1.3em;
+        margin: 0.8em 0 0;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+    #arg-code-block {
+      margin: -1em auto auto;
+    }
+  }
+
+  // region Highlight JS Styling
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    color: $debug-color6;
+    background: $debug-color1;
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    color: #998;
+    font-style: italic;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst {
+    color: #333;
+    font-weight: bold;
+  }
+
+  .hljs-number,
+  .hljs-literal,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-tag .hljs-attr {
+    color: $debug-color11;
+  }
+
+  .hljs-string,
+  .hljs-doctag {
+    color: $debug-color9;
+  }
+
+  .hljs-title,
+  .hljs-section,
+  .hljs-selector-id {
+    color: #900;
+    font-weight: bold;
+  }
+
+  .hljs-subst {
+    font-weight: normal;
+  }
+
+  .hljs-type,
+  .hljs-class .hljs-title {
+    color: #458;
+    font-weight: bold;
+  }
+
+  .hljs-tag,
+  .hljs-name,
+  .hljs-attribute {
+    color: #000080;
+    font-weight: normal;
+  }
+
+  .hljs-regexp,
+  .hljs-link {
+    color: #009926;
+  }
+
+  .hljs-symbol,
+  .hljs-bullet {
+    color: $debug-color7;
+  }
+
+  .hljs-built_in,
+  .hljs-builtin-name {
+    color: #0086b3;
+  }
+
+  .hljs-meta {
+    color: #999;
+    font-weight: bold;
+  }
+
+  .hljs-deletion {
+    background: #fdd;
+  }
+
+  .hljs-addition {
+    background: #dfd;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: bold;
+  }
+  // endregion
+
+  .removed-value {
+    background-color: #E8717A;
+    color: #3C0007;
+  }
+
+  .added-value {
+    background-color: #91E3A5;
+    color: #013C10;
+  }
+
+  #no-db {
+    text-align: center;
+    margin-top: 1.5em;
+    font-size: 1.5em;
+  }
+
+  #db-card {
+    width: 95%;
+    margin: 1.5em auto auto;
+    padding-left: 1em;
+    padding-right: 1em;
+    .title {
+      display: flex;
+      justify-content: center;
+      h2 {
+        font-size: 1.5em;
+        margin-right: 0.5em;
+      }
+      p {
+        font-size: 1em;
+        position: relative;
+        bottom: -10px;
+        #diff-toggle {
+          font-weight: bold;
+          text-decoration: underline;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    #db-card-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      #node-keys {
+        width: 95%;
+        p {
+          background: $debug-color5;
+          padding-left: 0.5em;
+          padding-top: 0.2em;
+          padding-bottom: 0.2em;
+          &:hover {
+            background: darken($debug-color5, 5);
+            cursor: pointer;
+          }
+        }
+      }
+      #db-path-segments {
+        grid-column: 2/9;
+        ul {
+          padding: 0;
+          align-items: flex-start;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          list-style: none;
+          margin: 0;
+          li {
+            &:hover {
+              cursor: pointer;
+              text-decoration: underline;
+            }
+            &::after {
+              content: "\0227B";
+              display: inline-block;
+              margin: 0 .6em;
+            }
+            &:last-of-type::after {
+              display: none;
+            }
+          }
+        }
+      }
+      pre {
+        grid-column: 2/9;
+      }
+    }
+  }
+}
