@@ -25,4 +25,4 @@
           :ci {:target :node-test
                :output-to "target/test.js"
                :ns-regexp "-test$"
-               :closure-defines {client.config/ci true}}}}
+               :closure-defines {schema-cartographer-ui.config/ci true}}}}
