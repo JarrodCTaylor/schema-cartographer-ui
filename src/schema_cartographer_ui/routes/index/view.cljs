@@ -22,11 +22,15 @@
       [:li.nav-link [:a {:on-click #(>dis [::route-events/settings :modal-visible? true])} "Options"]]]]))
 
 (defn breadcrumbs []
-  (let [{:keys [by-way-of]} (<sub [::route-subs/aside-selection-summary-info])]
+  (let [{:keys [by-way-of]} (<sub [::route-subs/aside-selection-summary-info])
+        display-incoming-references? (<sub [::route-subs/display-incoming-references?])]
     [:div#by-way-of-breadcrumbs
      [:ul
-      (for [{:keys [ns label]} by-way-of]
-        [:li {:key ns} [:a {:on-click #(>dis [::route-events/select-breadcrumb-ns ns])} label]])]]))
+      (if display-incoming-references?
+        (let [{:keys [ns label]} (last by-way-of)]
+          [:li {:key ns} [:a {:on-click #(>dis [::route-events/select-breadcrumb-ns ns])} label]])
+        (for [{:keys [ns label]} by-way-of]
+          [:li {:key ns} [:a {:on-click #(>dis [::route-events/select-breadcrumb-ns ns])} label]]))]]))
 
 (defn graph-actions
   []
@@ -153,8 +157,9 @@
 
 ; region === Name Space Details Tab
 (defn namespace-details-tab []
-  (let [{:keys [display-as-keywords?]} (<sub [::route-subs/settings])
-        {:keys [doc label referenced-by attrs attrs-kw preds]} (<sub [::route-subs/aside-selection-summary-info])]
+  (let [{:keys [display-as-keywords? color-scheme]} (<sub [::route-subs/settings])
+        {:keys [doc label referenced-by attrs attrs-kw preds]} (<sub [::route-subs/aside-selection-summary-info])
+        display-incoming-references? (<sub [::route-subs/display-incoming-references?])]
     [:div#namespace-details-tab
      [:> TransitionGroup
       [:> CSSTransition
@@ -170,8 +175,24 @@
            [:h4 "Referenced By"]
            [:ul
             (for [{:keys [ns label]} referenced-by]
-              [:li.link {:key ns
-                         :on-click #(>dis [::route-events/select-ns ns])} label])]])
+              [:li {:class (when-not display-incoming-references? "link")
+                    :key ns
+                    :on-click (fn [e]
+                                (when-not display-incoming-references?
+                                  (>dis [::route-events/select-ns ns])))} label])]
+           [:h4.title "Reverse Graphed Ref Direction" [tip
+                                                       [:img {:src (if (= "dark" color-scheme) "img/info-dark.svg" "img/info-light.svg")
+                                                              :style {:height "15px" :top "2px" :position "relative" :left "5px" :margin-top "-5px"}}]
+                                                       "Toggle to display incoming references to the selected namespace." "top"]]
+           (when display-incoming-references?
+             [:div {:style {:color "red"
+                            :margin-bottom "10px"}} "Attribute navigation is disabled while displaying incoming references."])
+           [:button.button
+            {:on-click (fn [e]
+                         (if display-incoming-references?
+                           (>dis [::route-events/set-incoming-references false])
+                           (>dis [::route-events/set-incoming-references true])))}
+            (if display-incoming-references? "Graph Outgoing Refs" "Graph Incoming Refs")]])
         (when (not-empty attrs)
           [:div.inset
            [:h4 "Required Attributes"]
@@ -718,11 +739,14 @@
   (let [active-tab (<sub [::route-subs/left-panel-active-tab])
         entity-selected? (<sub [::route-subs/entity-selected?])
         attr-selected? (<sub [::route-subs/attr-selected?])
+        display-incoming-references? (<sub [::route-subs/display-incoming-references?])
         {:keys [color-scheme]} (<sub [::route-subs/settings])
         {:keys [doc referenced-by attrs attrs-kw preds]} (<sub [::route-subs/aside-selection-summary-info])
         {:keys [ns-have-been-added? attrs-have-been-added?]} (<sub [::route-subs/schema-added-in-app?])
         tab (fn [tab-kw tab-name] [:div.tab {:class (when (= active-tab tab-kw) "active")
-                                             :on-click #(>dis [::route-events/set-left-panel-active-tab tab-kw])}
+                                             :on-click (fn [e]
+                                                         (when-not display-incoming-references?
+                                                           (>dis [::route-events/set-left-panel-active-tab tab-kw])))}
                                    [:span tab-name]])]
     [:div.left-panel
      [:div.tabs
@@ -799,13 +823,18 @@
 
 (defn right-panel []
   (let [node-data-array (clj->js (<sub [::route-subs/node-data-array]))
+        incoming-node-data-array  (clj->js (<sub [::route-subs/incoming-node-data-array]))
+        display-incoming-references? (<sub [::route-subs/display-incoming-references?])
+        display-nodes (if display-incoming-references? incoming-node-data-array node-data-array)
         linked-data-array (clj->js (<sub [::route-subs/linked-data-array]))
+        incoming-linked-data-array (clj->js (<sub [::route-subs/incoming-linked-data-array]))
+        display-links (if display-incoming-references? incoming-linked-data-array linked-data-array)
         color-scheme (<sub [::shared-subs/graph-colors])]
     [:div.right-panel.body-panel
      [:div.panel-body
       (when node-data-array
         [:div#go-diagram
-         ^{:key color-scheme} [gojs/diagram node-data-array linked-data-array color-scheme]])]]))
+         ^{:key color-scheme} [gojs/diagram display-nodes display-links color-scheme]])]]))
 
 (defn read-schema-load-and-dispatch [file-contents]
   (let [schema (-> file-contents

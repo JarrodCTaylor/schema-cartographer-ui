@@ -497,3 +497,8 @@
     (let [selected-namespaces-kw (map #(keyword (get % "value")) selected-namespaces)
           notices (map (partial find-refed-by db) selected-namespaces-kw)]
     {:db (assoc-in db [:routes :index :existing-ref-notices] notices)})))
+
+(rf/reg-event-fx
+  ::set-incoming-references
+  (fn [{:keys [db]} [_ bool]]
+    {:db (assoc-in db [:routes :index :display-incoming-references?] bool)}))

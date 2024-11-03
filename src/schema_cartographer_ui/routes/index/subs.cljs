@@ -155,6 +155,11 @@
   (fn [db _]
     (-> db :routes :index :diagram)))
 
+(rf/reg-sub
+  ::display-incoming-references?
+  (fn [db _]
+    (-> db :routes :index :display-incoming-references?)))
+
 ; region ---- Node Data Arrays -------------------------------------------------
 (defn attr->node [display-as-keywords? {:keys [ident value-type unique deprecated?]}]
   (let [attr-type (when value-type (str ": " (str/capitalize (name value-type))))
@@ -201,6 +206,26 @@
           display-as-keywords? (-> db :routes :index :settings :display-as-keywords?)]
       (when selected-ns-key
         (node-data-array display-as-keywords? {:enumerations filtered-attrs :entities filtered-entities})))))
+
+(rf/reg-sub
+  ::incoming-node-data-array
+  (fn [db _]
+    (let [selected-ns-key (-> db :routes :index :currently-selected-ns)
+          ns-bucket (ns-bucket selected-ns-key)
+          schema (-> db :routes :index :schema)
+          {:keys [referenced-by]} (some-> ns-bucket schema selected-ns-key)
+          referenced-by (map :ns (map (fn [ns]
+                                        {:ns ns
+                                         :label (qualified-kebab->title (name ns))}) referenced-by))
+          filtered-entities (select-keys (:entities schema) (sequence cat [referenced-by
+                                                                           [selected-ns-key]]))
+          filtered-attrs (if (= :entities ns-bucket)
+                           (select-keys (:enumerations schema) referenced-by)
+                           (select-keys (:enumerations schema) [selected-ns-key]))
+          display-as-keywords? (-> db :routes :index :settings :display-as-keywords?)]
+      (when selected-ns-key
+        (node-data-array display-as-keywords? {:enumerations filtered-attrs :entities filtered-entities})))))
+
 ; endregion
 
 ; region ---- Linked Data Arrays -----------------------------------------------
@@ -238,6 +263,18 @@
       (if (and selected-ns-key (= "cartographer.entity" (namespace selected-ns-key)))
         (mapcat #(linked-data-array schema %) (into previously-selected-ns-keys [selected-ns-key]))
         (mapcat #(linked-data-array schema %) previously-selected-ns-keys)))))
+
+(rf/reg-sub
+  ::incoming-linked-data-array
+  (fn [db _]
+    (let [schema (-> db :routes :index :schema)
+          selected-ns-key (-> db :routes :index :currently-selected-ns)
+          ns-bucket (ns-bucket selected-ns-key)
+          {:keys [referenced-by]} (some-> ns-bucket schema selected-ns-key)
+          referenced-by (map :ns (map (fn [ns]
+                                        {:ns ns
+                                         :label (qualified-kebab->title (name ns))}) referenced-by))]
+      (mapcat #(linked-data-array schema %) referenced-by))))
 ; endregion
 
 (rf/reg-sub
